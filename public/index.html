@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #chatHistory { height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        #userInput { width: 70%; padding: 5px; }
+        #sendButton { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1>Chat with AI</h1>
+    <div id="chatHistory"></div>
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button id="sendButton">Send</button>
+
+    <script>
+        const chatHistory = document.getElementById('chatHistory');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        let history = [];
+
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        async function sendMessage() {
+            const question = userInput.value.trim();
+            if (question === '') return;
+
+            // Display user message
+            chatHistory.innerHTML += `<p><strong>You:</strong> ${question}</p>`;
+            userInput.value = '';
+
+            try {
+                const response = await fetch('http://localhost:4004/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question, history }),
+                });
+
+                const data = await response.json();
+                
+                // Display AI response
+                chatHistory.innerHTML += `<p><strong>AI:</strong> ${data.answer}</p>`;
+                
+                // Update history
+                history.push({ type: 'human', content: question });
+                history.push({ type: 'ai', content: data.answer });
+
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            } catch (error) {
+                console.error('Error:', error);
+                chatHistory.innerHTML += `<p><strong>Error:</strong> Failed to get response from server.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
