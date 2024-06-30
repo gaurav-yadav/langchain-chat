@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain Chat</title>
+</head>
+<body>
+    <h1>Welcome to LangChain Chat</h1>
+    <div id="chat-container">
+        <div id="chat-messages"></div>
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+
+        async function sendMessage() {
+            const message = userInput.value;
+            if (!message) return;
+
+            // Display user message
+            chatMessages.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+            userInput.value = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: message, history: [] }),
+                });
+
+                const data = await response.json();
+                
+                // Display AI response
+                chatMessages.innerHTML += `<p><strong>AI:</strong> ${data.answer}</p>`;
+            } catch (error) {
+                console.error('Error:', error);
+                chatMessages.innerHTML += `<p><strong>Error:</strong> Failed to get response from server.</p>`;
+            }
+        }
+
+        // Allow sending message with Enter key
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
