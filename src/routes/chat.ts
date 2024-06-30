@@ -15,6 +15,15 @@ router.post("/", async (req, res) => {
 
   const { question, history } = req.body;
 
+  // Input validation
+  if (typeof question !== "string" || question.length > 500) {
+    return res.status(400).json({ error: "Invalid question format or length" });
+  }
+
+  if (!Array.isArray(history)) {
+    return res.status(400).json({ error: "Invalid history format" });
+  }
+
   try {
     console.log("\n--- New Chat Request ---");
     console.log(`Question: ${question}`);
