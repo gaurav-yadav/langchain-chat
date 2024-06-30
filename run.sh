@@ -12,8 +12,14 @@ if [ -z "$2" ]; then
     exit 1
 fi
 
-# Generate a unique container name
-CONTAINER_NAME="langchain-chat-$(date +%s)"
+# Define a static container name
+CONTAINER_NAME="langchain-chat-container"
+
+# Build the Docker image if it doesn't exist locally
+if ! docker image inspect langchain-local-chat >/dev/null 2>&1; then
+    echo "Building Docker image..."
+    docker build -t langchain-local-chat .
+fi
 
 # Run the Docker container
 docker run -d \
