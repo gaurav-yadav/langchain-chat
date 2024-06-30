@@ -9,6 +9,7 @@ dist/
 
 # Vector store
 vector_store/
+vector_store_metadata.json
 
 # Logs
 *.log
